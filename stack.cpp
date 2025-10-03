@@ -33,7 +33,6 @@ void ProgrammForTerminalInput(stack_t *stk)
     }
 
     OutputForUser(stk);
-    printf("%d %d\n", stk->data[0], stk->data[stk->capacity]);//
     StackDump(stk);
     StackDestroy(stk);
 }
