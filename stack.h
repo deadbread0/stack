@@ -1,4 +1,4 @@
-const int CAPACITY = 11;
+const int CAPACITY = 10;
 const int MAX_LEN_OF_WORD = 100;
 const int LEFT_CONSTANT = 0xFEDCBA;
 const int RIGHT_CONSTANT = 0xFEDCBA;
@@ -70,6 +70,8 @@ void OutputForUser(stack_t *stk);
 WasFileRead OpenAndCheckFileForReading(FILE** filee, const char* filee_name);
 bool InputFromFile(FILE* filee, stack_t *stk);
 void RemoveSymbOfNewStr(char *string);
+void ProgrammForTerminalInput(stack_t *stk);
+void ProgrammForFileInput(stack_t *stk, const char* filee_name);
 
 commands_t ArrayOfCommands[] = {{"push", StackPush, "pushing a number onto the stack"},
                                 {"add", AddNumbers, "adding numbers"},

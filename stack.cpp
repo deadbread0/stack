@@ -5,44 +5,55 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "stack.h"
+#include "stack.h"//verify
 
 int main(const int argc, const char* argv[])
 {
     stack_t stk = {};
-    bool prm_for_while = true, prm_for_while1 = true;
     StackInit(&stk, CAPACITY);
 
     const char* filee_name = argc > 0? argv[1]: "";
     if (filee_name != nullptr)
     {
-        FILE* filee = nullptr;
-        if (!OpenAndCheckFileForReading(&filee, filee_name))
-            return 0;
-        while (prm_for_while && prm_for_while1)
-        {
-            prm_for_while = InputFromFile(filee, &stk);
-            Canary(&stk);
-            prm_for_while1 = StackVerify(&stk);
-        }
-
-        OutputForUser(&stk);
-        StackDump(&stk);
-        StackDestroy(&stk);
+        ProgrammForFileInput(&stk, filee_name);
         return 0;
     }
+    ProgrammForTerminalInput(&stk);
+    return 0;
+}
 
+void ProgrammForTerminalInput(stack_t *stk)
+{
+    bool prm_for_while = true, prm_for_while1 = true;
     while (prm_for_while && prm_for_while1)
     {
-        prm_for_while = Input(&stk);
-        Canary(&stk);
-        prm_for_while1 = StackVerify(&stk);
+        prm_for_while = Input(stk);
+        Canary(stk);
+        prm_for_while1 = StackVerify(stk);
     }
 
-    OutputForUser(&stk);
-    StackDump(&stk);
-    StackDestroy(&stk);
-    return 0;
+    OutputForUser(stk);
+    printf("%d %d\n", stk->data[0], stk->data[stk->capacity]);//
+    StackDump(stk);
+    StackDestroy(stk);
+}
+
+void ProgrammForFileInput(stack_t *stk, const char* filee_name)
+{
+    bool prm_for_while = true, prm_for_while1 = true;
+    FILE* filee = nullptr;
+    if (!OpenAndCheckFileForReading(&filee, filee_name))
+        return;
+    while (prm_for_while && prm_for_while1)
+    {
+        prm_for_while = InputFromFile(filee, stk);
+        Canary(stk);
+        prm_for_while1 = StackVerify(stk);
+    }
+
+    OutputForUser(stk);
+    StackDump(stk);
+    StackDestroy(stk);
 }
 
 WasFileRead OpenAndCheckFileForReading(FILE** filee, const char* filee_name)//
@@ -66,6 +77,7 @@ void Canary(stack_t *stk)
 
 bool Input(stack_t *stk)
 {
+    StackVerify(stk);
     printf("enter the command and the value if necessary\n");
     char inf[MAX_LEN_OF_WORD] = {0};
     gets(inf);
@@ -75,6 +87,7 @@ bool Input(stack_t *stk)
 
 bool InputFromFile(FILE* filee, stack_t *stk)
 {
+    StackVerify(stk);
     char inf[MAX_LEN_OF_WORD] = {0};
     fgets(inf, MAX_LEN_OF_WORD, filee);
     return RunFunc(stk, inf);
@@ -97,6 +110,7 @@ bool RunFunc(stack_t *stk, char* inf)
         }
         else if (num_of_func > 0 && comp != 0)//
         {
+            StackVerify(stk);
             ArrayOfCommands[num_of_func].pt(stk, numm);
             return true;
         }
@@ -202,11 +216,11 @@ void StackPush(stack_t *stk, int num)
 
     if (size >= capacity - 2)
     {
-        int *new_ptr = (int *)realloc(stk->data, capacity * 2 + 1);
+        int *new_ptr = (int *)realloc(stk->data, (capacity * 2 + 1) * sizeof(int));
         stk->data = new_ptr;
         StackVerify(stk);
         stk->capacity = capacity * 2;
-        stk->data[capacity] = RIGHT_CONSTANT;
+        stk->data[stk->capacity] = RIGHT_CONSTANT;
     }
     stk->size++;
     stk->data[size + 1] = num;
@@ -258,12 +272,14 @@ void StackDestroy(stack_t *stk, int n)
 
 void AddNumbers(stack_t *stk, int n)
 {
+    StackVerify(stk);
     int size = stk->size;
     int *data = stk->data;
 
     if (size - 1 <= 0)
     {
-        stk->error = CAPACITY_OR_SIZE_LESS_THAN_ZERO;
+        stk->size = size - 2;
+        StackVerify(stk);
         return;
     }
 
@@ -277,12 +293,14 @@ void AddNumbers(stack_t *stk, int n)
 
 void DifferenceOfNumbers(stack_t *stk, int n)
 {
+    StackVerify(stk);
     int size = stk->size;
     int *data = stk->data;
 
     if (size - 1 <= 0)
     {
-        stk->error = CAPACITY_OR_SIZE_LESS_THAN_ZERO;
+        stk->size = size - 2;
+        StackVerify(stk);
         return;
     }
 
@@ -294,12 +312,14 @@ void DifferenceOfNumbers(stack_t *stk, int n)
 
 void QuotientOfNumbers(stack_t *stk, int n)
 {
+    StackVerify(stk);
     int size = stk->size;
     int *data = stk->data;
 
     if (size - 1 <= 0)
     {
-        stk->error = CAPACITY_OR_SIZE_LESS_THAN_ZERO;
+        stk->size = size - 2;
+        StackVerify(stk);
         return;
     }
 
@@ -311,12 +331,14 @@ void QuotientOfNumbers(stack_t *stk, int n)
 
 void MultiplyingNumbers(stack_t *stk, int n)
 {
+    StackVerify(stk);
     int size = stk->size;
     int *data = stk->data;
 
     if (size - 1 <= 0)
     {
-        stk->error = CAPACITY_OR_SIZE_LESS_THAN_ZERO;
+        stk->size = size - 2;
+        StackVerify(stk);
         return;
     }
 
@@ -328,11 +350,13 @@ void MultiplyingNumbers(stack_t *stk, int n)
 
 void SquareRootOfNumber(stack_t *stk, int n)
 {
+    StackVerify(stk);
     stk->data[stk->size] = sqrt(stk->data[stk->size]);
 }
 
 void OutputForUser(stack_t *stk)
 {
+    StackVerify(stk);
     StackErr_t err = stk->error;
     if (err != NO_ERRORS)
         printf("%s\n", ArrayOfErrors[err].description);
