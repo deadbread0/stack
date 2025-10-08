@@ -72,6 +72,9 @@ bool InputFromFile(FILE* filee, stack_t *stk);
 void RemoveSymbOfNewStr(char *string);
 void ProgrammForTerminalInput(stack_t *stk);
 void ProgrammForFileInput(stack_t *stk, const char* filee_name);
+int CompareStringWithCommandForAsm(char *string);
+int LooksForNumInStringForAsm(char* str, int* numm);
+bool RunFuncForAsm(stack_t *stk, char* inf);
 
 commands_t ArrayOfCommands[] = {{"push", StackPush, "pushing a number onto the stack"},
                                 {"add", AddNumbers, "adding numbers"},
@@ -83,3 +86,4 @@ commands_t ArrayOfCommands[] = {{"push", StackPush, "pushing a number onto the s
                                 {"hlt", StackDestroy, "ends the loop"}};
 
 const int amount_of_commands = sizeof(ArrayOfCommands)/sizeof(ArrayOfCommands[0]);//
+const int num_of_hlt = 7;

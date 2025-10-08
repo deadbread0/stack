@@ -1,3 +1,4 @@
+/*это основная программа, ввод из файла: команды - числа, ввод из терминала - команды буквами*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -5,7 +6,7 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "stack.h"//verify
+#include "stack.h"
 
 int main(const int argc, const char* argv[])
 {
@@ -89,8 +90,38 @@ bool InputFromFile(FILE* filee, stack_t *stk)
     StackVerify(stk);
     char inf[MAX_LEN_OF_WORD] = {0};
     fgets(inf, MAX_LEN_OF_WORD, filee);
-    return RunFunc(stk, inf);
+    if (*inf == '\0' || *inf == EOF)
+        return false;
+    return RunFuncForAsm(stk, inf);
     
+}
+
+bool RunFuncForAsm(stack_t *stk, char* inf)
+{
+    int numm = 0, counter = 0;
+
+    int num_of_func = CompareStringWithCommandForAsm(inf);
+        if (num_of_func == 0)
+        {
+            counter = LooksForNumInStringForAsm(inf, &numm);
+            StackVerify(stk, numm);
+            if (counter > 0)
+                ArrayOfCommands[num_of_func].pt(stk, numm);
+            return true;
+        }
+        else if (num_of_func > 0 && atoi(inf) != num_of_hlt)//
+        {
+            StackVerify(stk);
+            ArrayOfCommands[num_of_func].pt(stk, numm);
+            return true;
+        }
+        else if (atoi(inf) != num_of_hlt)
+        {
+            numm = 1;
+            StackVerify(stk, numm);
+            return false;
+        }
+        return false;
 }
 
 bool RunFunc(stack_t *stk, char* inf)
@@ -122,9 +153,41 @@ bool RunFunc(stack_t *stk, char* inf)
         return false;
 }
 
+int LooksForNumInStringForAsm(char* str, int* numm)
+{
+    int i = 1;//
+    int num = 0, counter = 0;
+    int num_of_command = atoi(str);
+    while (num_of_command > 0)
+    {
+        i++;
+        num_of_command = num_of_command / 10;
+    }
+
+    while (str[i] != '\0')
+    {
+        if (isdigit(str[i]))
+        {
+            num = num * 10 + (int)str[i] - '0';
+            counter++;
+            i++;
+            continue;
+        }
+        else if (counter != 0 && !isdigit(str[i]))
+            break;
+        i++;
+    }
+    if (counter != 0)
+    {
+        *numm = num;
+        return 1;
+    }
+    return 0;
+}
+
 int LooksForNumInString(char* str, int* numm)
 {
-    int i = strlen("push");//
+    int i = 0;//
     int num = 0, counter = 0;
     while (str[i] != '\0')
     {
@@ -145,6 +208,17 @@ int LooksForNumInString(char* str, int* numm)
         return 1;
     }
     return 0;
+}
+
+int CompareStringWithCommandForAsm(char *string)
+{
+    RemoveSymbOfNewStr(string);
+    for (int i = 0; i < amount_of_commands; i++)
+    {
+        if (i == atoi(string))
+            return i;
+    }
+    return -1;
 }
 
 int CompareStringWithCommand(char *string)
