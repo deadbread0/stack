@@ -13,20 +13,16 @@ int main(const int argc, const char* argv[])
     int amount_of_str = 0, sum_of_steps = 0, counter = 0;
     char* inf[MAX_SIZE_ARR] = {0};
     ProgrammForFileInput(filee_name, inf, &amount_of_str);
-    int arr[MAX_SIZE_ARR] = {0}, arr_of_steps[MAX_SIZE_ARR] = {0};
     bool prm_for_while = true;
 
     while(prm_for_while && counter < amount_of_str)
-    {
-        prm_for_while = Push(inf, arr, arr_of_steps, counter, &sum_of_steps);
-        counter++;
-    }
+        prm_for_while = Push(inf, counter++, &sum_of_steps);
 
-    OutputInFile(arr, arr_of_steps, counter);
+    OutputInFile(arr, counter);
     return 0;
 }
 
-void OutputInFile(int* arr, int* arr_of_steps, int i)
+void OutputInFile(int* arr, int i)
 {
     /*FILE* output_file = fopen("datasm", "w"); если я пытаюсь открыть файл, программа зависает...((
     а так то вывод должен быть в файл, но пока есть только в терминал*/
@@ -106,7 +102,7 @@ WasFileRead OpenAndCheckFileForReading(FILE** filee, const char* filee_name)//
     return YES;
 }
 
-bool Push(char** inf, int* arr, int* arr_of_steps, int i, int* sum_of_steps)
+bool Push(char** inf, int i, int* sum_of_steps)
 {
     int numm = 0, counter = 0;
     if (*(inf + i) == nullptr)
@@ -126,10 +122,22 @@ bool Push(char** inf, int* arr, int* arr_of_steps, int i, int* sum_of_steps)
                 arr_of_steps[i] = 1;
             return true;
         }
-        else if (num_of_func > 0)//
+        else if (num_of_func > 0 && num_of_func < first_reg_command)
         {
             arr[i + *sum_of_steps] = num_of_func;
             arr_of_steps[i] = 1;
+            return true;
+        }
+        else if (num_of_func >= first_reg_command)
+        {
+            arr[i + *sum_of_steps] = num_of_func;
+            counter = LooksForReg(*(inf + i));
+            if (counter >= 0)
+            {
+                arr_of_steps[i] = 2;
+                (*sum_of_steps)++;
+                arr[i + *sum_of_steps] = numm;
+            }
             return true;
         }
         return false;
@@ -163,10 +171,12 @@ int LooksForNumInString(char* str, int* numm)
 int CompareStringWithCommand(char *string)
 {
     RemoveSymbOfNewStr(string);
-    int len = strlen("push");
+    int len = strlen(string);
+    if (len > len_for_strncmp)
+        len = len_for_strncmp;
     for (int i = 0; i < amount_of_commands; i++)
     {
-        if (strncmp(string, ArrayOfCommands[i], len) == 0)//
+        if (strncmp(string, ArrayOfCommands[i], len) == 0)
         {
             return i;
         }
@@ -181,4 +191,15 @@ void RemoveSymbOfNewStr(char *string)
         if (string[i] =='\n')
             string[i - 1] = '\0';
     }
+}
+
+int LooksForReg(char* str)
+{
+    int len = strlen(str) - 2;/////
+    int num = (int)str[len] - (int)'a';
+    if (num >= 0 && num < SIZE_OF_REG)
+    {
+        return num;
+    }
+    return -1;
 }

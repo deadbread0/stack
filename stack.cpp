@@ -8,18 +8,24 @@
 
 #include "stack.h"
 
+
 int main(const int argc, const char* argv[])
 {
     stack_t stk = {};
     StackInit(&stk, CAPACITY);
+    spu_t spu = SpuInit(&stk);
 
     const char* filee_name = argc > 0? argv[1]: "";
     if (filee_name != nullptr)
     {
-        ProgrammForFileInput(&stk, filee_name);
+        ProgrammForFileInput(&spu, filee_name);
+        /*for (int i = 0; i < SIZE_OF_REG; i++)
+            printf("%d\n", regs[i]);*/
         return 0;
     }
     ProgrammForTerminalInput(&stk);
+    /*for (int i = 0; i < SIZE_OF_REG; i++)
+        printf("%d\n", regs[i]);*/
     return 0;
 }
 
@@ -38,7 +44,7 @@ void ProgrammForTerminalInput(stack_t *stk)
     StackDestroy(stk);
 }
 
-void ProgrammForFileInput(stack_t *stk, const char* filee_name)
+void ProgrammForFileInput(spu_t* spu, const char* filee_name)
 {
     bool prm_for_while = true, prm_for_while1 = true;
     FILE* filee = nullptr;
@@ -46,14 +52,14 @@ void ProgrammForFileInput(stack_t *stk, const char* filee_name)
         return;
     while (prm_for_while && prm_for_while1)
     {
-        prm_for_while = InputFromFile(filee, stk);
-        Canary(stk);
-        prm_for_while1 = StackVerify(stk);
+        prm_for_while = InputFromFile(filee, spu);
+        Canary(spu->stack);
+        prm_for_while1 = StackVerify(spu->stack);
     }
 
-    OutputForUser(stk);
-    StackDump(stk);
-    StackDestroy(stk);
+    OutputForUser(spu->stack);
+    StackDump(spu->stack);
+    StackDestroy(spu->stack);
 }
 
 WasFileRead OpenAndCheckFileForReading(FILE** filee, const char* filee_name)//
@@ -85,14 +91,14 @@ bool Input(stack_t *stk)
     
 }
 
-bool InputFromFile(FILE* filee, stack_t *stk)
+bool InputFromFile(FILE* filee, spu_t* spu)
 {
-    StackVerify(stk);
+    StackVerify(spu->stack);
     char inf[MAX_LEN_OF_WORD] = {0};
     fgets(inf, MAX_LEN_OF_WORD, filee);
     if (*inf == '\0' || *inf == EOF)
         return false;
-    return RunFuncForAsm(stk, inf);
+    return RunFuncForAsm(spu->stack, inf);
     
 }
 
@@ -109,7 +115,7 @@ bool RunFuncForAsm(stack_t *stk, char* inf)
                 ArrayOfCommands[num_of_func].pt(stk, numm);
             return true;
         }
-        else if (num_of_func > 0 && atoi(inf) != num_of_hlt)//
+        else if (num_of_func > 0 && atoi(inf) != num_of_hlt)
         {
             StackVerify(stk);
             ArrayOfCommands[num_of_func].pt(stk, numm);
@@ -127,7 +133,7 @@ bool RunFuncForAsm(stack_t *stk, char* inf)
 bool RunFunc(stack_t *stk, char* inf)
 {
     int numm = 0, counter = 0;
-    int comp = strncmp(inf, "hlt", MAX_LEN_OF_WORD);
+    int comp = strncmp(inf, "hlt", MAX_LEN_OF_WORD);///
 
     int num_of_func = CompareStringWithCommand(inf);
         if (num_of_func == 0)
@@ -138,11 +144,20 @@ bool RunFunc(stack_t *stk, char* inf)
                 ArrayOfCommands[num_of_func].pt(stk, numm);
             return true;
         }
-        else if (num_of_func > 0 && comp != 0)//
+        else if (num_of_func > 0 && comp != 0 && num_of_func < first_reg_command)
         {
             StackVerify(stk);
             ArrayOfCommands[num_of_func].pt(stk, numm);
             return true;
+        }
+        else if (num_of_func >= first_reg_command)//
+        {
+            int reg = LooksForReg(inf);
+            if (reg >= 0)
+            {
+                ArrayOfCommands[num_of_func].pt(stk, reg);
+                return true;
+            }
         }
         else if (comp != 0)
         {
@@ -151,6 +166,17 @@ bool RunFunc(stack_t *stk, char* inf)
             return false;
         }
         return false;
+}
+
+int LooksForReg(char* str)
+{
+    int len = strlen(str) - 2;/////
+    int num = (int)str[len] - (int)'a';
+    if (num >= 0 && num < SIZE_OF_REG)
+    {
+        return num;
+    }
+    return -1;
 }
 
 int LooksForNumInStringForAsm(char* str, int* numm)
@@ -224,7 +250,9 @@ int CompareStringWithCommandForAsm(char *string)
 int CompareStringWithCommand(char *string)
 {
     RemoveSymbOfNewStr(string);
-    int len = strlen("push");
+    int len = strlen(string);
+    if (len > len_for_strncmp)
+        len = len_for_strncmp;
     for (int i = 0; i < amount_of_commands; i++)
     {
         if (strncmp(string, ArrayOfCommands[i].command, len) == 0)//
@@ -253,6 +281,17 @@ void StackInit(stack_t *stk, const int CAPACITY)
     stk->data[CAPACITY] = 0xFEDCBA;
     stk->size = 0;
     stk->error = NO_ERRORS;
+}
+
+spu_t SpuInit(stack_t *stk)
+{
+    spu_t spu = {};
+    spu.stack = stk;
+    spu.ip = 0;
+    spu.regs = regs;
+    int* steps = (int*)calloc(CAPACITY, sizeof(int));
+    spu.steps = steps;
+    return spu;
 }
 
 bool StackVerify(stack_t *stk, int prm)
@@ -299,6 +338,12 @@ void StackPush(stack_t *stk, int num)
     stk->data[size + 1] = num;
 }
 
+void Popr(stack_t *stk, int reg)
+{
+    regs[reg] = stk->data[stk->size];
+    stk->size--;
+}
+
 void StackPop(stack_t *stk, int n)
 {
     StackVerify(stk);
@@ -310,6 +355,11 @@ void StackPop(stack_t *stk, int n)
     printf("last number from stack: %d\n", data[size]);
     stk->data[size] = 0;
     stk->size--;
+}
+
+void Pushr(stack_t *stk, int reg)
+{
+    regs[reg] = 0;
 }
 
 void StackDump(stack_t *stk) 
