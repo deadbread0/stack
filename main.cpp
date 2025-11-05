@@ -13,19 +13,21 @@ int main(const int argc, const char* argv[])
 {
     stack_t stk = {};
     StackInit(&stk, CAPACITY);
-    spu_t spu = SpuInit(&stk);
+    spu_t spu = {};
+    SpuInit(&stk, &spu);
+    spu.regs = regs;
 
     const char* filee_name = argc > 0? argv[1]: "";
     if (filee_name != nullptr)
     {
         ProgramForFileInput(&spu, filee_name);
         /*for (int i = 0; i < SIZE_OF_REG; i++)
-            printf("%d\n", regs[i]);*/
+            printf("%d\n", spu.regs[i]);*/
         return 0;
     }
     ProgramForTerminalInput(&spu);
     /*for (int i = 0; i < SIZE_OF_REG; i++)
-        printf("%d\n", regs[i]);*/
+        printf("%d\n", spu.regs[i]);*/
     return 0;
 }
 

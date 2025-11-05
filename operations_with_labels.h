@@ -1,5 +1,3 @@
-const int RIGHT_CONSTANT = 0xFEDCBA;
-
 enum StackErr_t {
     NO_ERRORS,
     MEMORY_ALLOCATION,
@@ -29,20 +27,11 @@ struct spu_t {
     int* labels;
 };
 
-struct stack_err_t {
-    StackErr_t type;
-    const char* description;
-};
-
-
-
-void AddNumbers(spu_t* spu, int n = NULL);
-void DifferenceOfNumbers(spu_t* spu, int n = NULL);
-void QuotientOfNumbers(spu_t* spu, int n = NULL);
-void MultiplyingNumbers(spu_t* spu, int n = NULL);
-void SquareRootOfNumber(spu_t* spu, int n = NULL);
 bool StackVerify(stack_t *stk, int prm = -1);
-void StackPush(spu_t* spu, int num);
-void StackDump(spu_t* spu);
-void StackDestroy(spu_t* spu, int n = NULL);
-void StackPop(spu_t* spu, int n = NULL);
+void JumpIfBelow(spu_t* spu, int num);
+void FillSpuForJump(spu_t* spu, int num);
+void JumpIfBelowOrEqual(spu_t* spu, int num);
+void JumpIfAbove(spu_t* spu, int num);
+void JumpIfAboveOrEqual(spu_t* spu, int num);
+void JumpIfEqual(spu_t* spu, int num);
+void JumpIfNotEqual(spu_t* spu, int num);

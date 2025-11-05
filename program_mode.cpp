@@ -37,7 +37,7 @@ void ProgramForFileInput(spu_t* spu, const char* filee_name)
         if (spu->steps[ip] == 0)
             break;
 
-        RunFuncForAsm(spu);
+        RunFuncForMC(spu);
         Canary(spu->stack);
         prm_for_while1 = StackVerify(spu->stack);
         spu->ip++;

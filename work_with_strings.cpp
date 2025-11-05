@@ -15,10 +15,10 @@ int LooksForReg(char* str)
     return -1;
 }
 
-int LooksForNumInStringForAsm(char* str, int* numm)
+bool LooksForNumInString(char* str, int* numm)//bool
 {
     int i = 1;//
-    int num = 0, counter = 0;
+    int num = 0, counter = 0, sign = 1, colon = 0;
     int num_of_command = atoi(str);
     while (num_of_command > 0)
     {
@@ -28,6 +28,10 @@ int LooksForNumInStringForAsm(char* str, int* numm)
 
     while (str[i] != '\0')
     {
+        if (str[i] == '-')
+            sign = -1;
+        if (str[i] == ':')
+            colon++;
         if (isdigit(str[i]))
         {
             num = num * 10 + (int)str[i] - '0';
@@ -39,39 +43,14 @@ int LooksForNumInStringForAsm(char* str, int* numm)
             break;
         i++;
     }
+
     if (counter != 0)
     {
-        *numm = num;
-        return 1;
+        *numm = num * sign;
+        return true;
     }
-    return 0;
+    return false;
 }
-
-int LooksForNumInString(char* str, int* numm)
-{
-    int i = 0;//
-    int num = 0, counter = 0;
-    while (str[i] != '\0')
-    {
-        if (isdigit(str[i]))
-        {
-            num = num * 10 + (int)str[i] - '0';
-            counter++;
-            i++;
-            continue;
-        }
-        else if (counter != 0 && !isdigit(str[i]))
-            break;
-        i++;
-    }
-    if (counter != 0)
-    {
-        *numm = num;
-        return 1;
-    }
-    return 0;
-}
-
 
 void RemoveSymbOfNewStr(char *string)
 {

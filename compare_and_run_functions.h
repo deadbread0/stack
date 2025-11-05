@@ -27,6 +27,7 @@ struct spu_t {
     int* steps;
     int amount_of_steps;
     int* regs;
+    int* labels;
 };
 
 typedef void (*function_ptr)(spu_t*, int); 
@@ -47,6 +48,14 @@ void MultiplyingNumbers(spu_t* spu, int n = NULL);
 void SquareRootOfNumber(spu_t* spu, int n = NULL);
 void Popr(spu_t* spu, int num);
 void Pushr(spu_t* spu, int reg);
+void FillLabels(spu_t* spu, int n);
+void JumpIfBelow(spu_t* spu, int num);
+void JumpIfBelowOrEqual(spu_t* spu, int num);
+void JumpIfAbove(spu_t* spu, int num);
+void JumpIfAboveOrEqual(spu_t* spu, int num);
+void JumpIfEqual(spu_t* spu, int num);
+void JumpIfNotEqual(spu_t* spu, int num);
+void StackDump(spu_t* spu);
 
 commands_t ArrayOfCommands[] = {{"push ", StackPush, "pushing a number onto the stack"},
                                 {"add", AddNumbers, "adding numbers"},
@@ -57,7 +66,14 @@ commands_t ArrayOfCommands[] = {{"push ", StackPush, "pushing a number onto the 
                                 {"out", StackPop, "returns the value removed from the stack"},
                                 {"hlt", StackDestroy, "ends the loop"},
                                 {"popr ", Popr, "add number in register"},
-                                {"pushr", Pushr, "delete number from register"}};
+                                {"pushr", Pushr, "delete number from register"},
+                                {":", FillLabels, "add label to array"},
+                                {"jb", JumpIfBelow, "jump if last number is less than practically last"},
+                                {"jbe", JumpIfBelowOrEqual, "jump if last number is less or equal than practically last"},
+                                {"ja", JumpIfAbove, "jump if last number is bigger than practically last"},
+                                {"jae", JumpIfAboveOrEqual, "jump if last number is bigger or equal than practically last"},
+                                {"je", JumpIfEqual, "jump if last number is equal to practically last"},
+                                {"jne", JumpIfNotEqual, "jump if last number is not equal to practically last"}};
 
 const int amount_of_commands = sizeof(ArrayOfCommands)/sizeof(ArrayOfCommands[0]);
 
@@ -69,7 +85,7 @@ int LooksForNumInString(char* str, int* numm);
 int LooksForReg(char* str);
 void RemoveSymbOfNewStr(char *string);
 bool RunFunc(spu_t* spu, char* inf);
-bool RunFuncForAsm(spu_t* spu);
+bool RunFuncForMC(spu_t* spu);
 
 
 const int len_for_strncmp = strlen("pushr");

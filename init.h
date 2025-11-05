@@ -1,6 +1,7 @@
 const int CAPACITY = 10;
 const int SIZE_OF_REG = 16;
 const int MAX_SIZE_OF_CODE = 100000;
+const int AMOUNT_OF_LABELS = 10;
 
 enum StackErr_t {
     NO_ERRORS,
@@ -28,10 +29,11 @@ struct spu_t {
     int* steps;
     int amount_of_steps;
     int* regs;
+    int* labels;
 };
 
 void StackInit(stack_t *stk, const int CAPACITY);
-spu_t SpuInit(stack_t *stk);
+void SpuInit(stack_t *stk, spu_t *spu);
 bool StackVerify(stack_t *stk, int prm = -1);
-int LooksForNumInStringForAsm(char* str, int* numm);
+int LooksForNumInString(char* str, int* numm);
 void FillSpu(spu_t* spu, char* inf);

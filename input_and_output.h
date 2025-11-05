@@ -31,6 +31,7 @@ struct spu_t {
     int* steps;
     int amount_of_steps;
     int* regs;
+    int* labels;
 };
 
 stack_err_t ArrayOfErrors[] = {{NO_ERRORS, "no errors"},

@@ -25,6 +25,7 @@ struct spu_t {
     int* steps;
     int amount_of_steps;
     int* regs;
+    int* labels;
 };
 
 enum WasFileRead {
@@ -42,4 +43,4 @@ void StackDump(spu_t* spu);
 void StackDestroy(spu_t* spu, int n = NULL);
 WasFileRead OpenAndCheckFileForReading(FILE** filee, const char* filee_name);
 void InputFromFile(FILE* filee, spu_t* spu);
-bool RunFuncForAsm(spu_t* spu);
+bool RunFuncForMC(spu_t* spu);

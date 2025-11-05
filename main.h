@@ -1,4 +1,7 @@
 const int CAPACITY = 10;
+const int SIZE_OF_REG = 16;
+
+int regs[SIZE_OF_REG] = {0};//так норм вообще делать?? Просто если я инициализирую в spuinit, то там массив мусором забивается((
 
 enum StackErr_t {
     NO_ERRORS,
@@ -26,10 +29,11 @@ struct spu_t {
     int* steps;
     int amount_of_steps;
     int* regs;
+    int* labels;
 };
                              
 
 void StackInit(stack_t *stk, const int CAPACITY);
-spu_t SpuInit(stack_t *stk);
+void SpuInit(stack_t *stk, spu_t *spu);
 void ProgramForTerminalInput(spu_t* spu);
 void ProgramForFileInput(spu_t* spu, const char* filee_name);
