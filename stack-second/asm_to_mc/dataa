@@ -1,0 +1,9 @@
+push -1
+popm 0
+pushm 0
+push 5
+add
+popm 1
+pushm 0
+out
+hlt
